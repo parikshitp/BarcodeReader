@@ -44,7 +44,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import java.io.IOException;
 import java.util.List;
 
-public class BarcodeReader extends Fragment implements View.OnTouchListener, BarcodeTrackerFactory.BarcodeReaderListener {
+public final class BarcodeReader extends Fragment implements View.OnTouchListener, BarcodeTrackerFactory.BarcodeReaderListener {
     private static final String TAG = BarcodeReader.class.getSimpleName();
 
     // intent request code to handle updating play services if needed.
@@ -371,6 +371,22 @@ public class BarcodeReader extends Fragment implements View.OnTouchListener, Bar
         }
     }
 
+
+    public void stopPreview() {
+        if (mPreview != null) {
+            mPreview.stop();
+        }
+    }
+
+    public void startPreview() {
+        startCameraSource();
+    }
+
+    public void useFlash(boolean isFlashOn) {
+        if (mCameraSource != null) {
+            mCameraSource.setFlashMode(isFlashOn ? Camera.Parameters.FLASH_MODE_TORCH : Camera.Parameters.FLASH_MODE_OFF);
+        }
+    }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {

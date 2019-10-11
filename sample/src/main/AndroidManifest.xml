@@ -16,9 +16,6 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name="com.fasiculus.barcodereader.QrDetailsActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name="com.fasiculus.barcodereader.ScanActivity"
             android:screenOrientation="portrait" />
         <activity

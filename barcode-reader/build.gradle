@@ -25,7 +25,7 @@ ext {
     siteUrl = 'https://github.com/parikshitp/BarcodeReader'
     gitUrl = 'https://github.com/parikshitp/BarcodeReader.git'
 
-    libraryVersion = '1.0.0'
+    libraryVersion = '1.0.1'
 
     developerId = 'imhemantsharma'
     developerName = 'Hemant Sharma'
@@ -130,7 +130,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

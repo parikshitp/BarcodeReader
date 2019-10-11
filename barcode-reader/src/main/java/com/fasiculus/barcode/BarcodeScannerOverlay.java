@@ -14,32 +14,32 @@ import android.view.ViewGroup;
 import androidx.core.content.ContextCompat;
 
 
-public class ScannerOverlay extends ViewGroup {
+public class BarcodeScannerOverlay extends ViewGroup {
     private float left, top, endY;
     private int rectWidth, rectHeight;
     private int frames;
     private boolean revAnimation;
     private int lineColor, lineWidth;
 
-    public ScannerOverlay(Context context) {
+    public BarcodeScannerOverlay(Context context) {
         super(context);
     }
 
-    public ScannerOverlay(Context context, AttributeSet attrs) {
+    public BarcodeScannerOverlay(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ScannerOverlay(Context context, AttributeSet attrs, int defStyle) {
+    public BarcodeScannerOverlay(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
-                R.styleable.ScannerOverlay,
+                R.styleable.BarcodeScannerOverlay,
                 0, 0);
-        rectWidth = a.getInteger(R.styleable.ScannerOverlay_square_width, getResources().getInteger(R.integer.scanner_rect_width));
-        rectHeight = a.getInteger(R.styleable.ScannerOverlay_square_height, getResources().getInteger(R.integer.scanner_rect_height));
-        lineColor = a.getColor(R.styleable.ScannerOverlay_line_color, ContextCompat.getColor(context, R.color.scanner_line));
-        lineWidth = a.getInteger(R.styleable.ScannerOverlay_line_width, getResources().getInteger(R.integer.line_width));
-        frames = a.getInteger(R.styleable.ScannerOverlay_line_speed, getResources().getInteger(R.integer.line_width));
+        rectWidth = a.getInteger(R.styleable.BarcodeScannerOverlay_square_width, getResources().getInteger(R.integer.scanner_rect_width));
+        rectHeight = a.getInteger(R.styleable.BarcodeScannerOverlay_square_height, getResources().getInteger(R.integer.scanner_rect_height));
+        lineColor = a.getColor(R.styleable.BarcodeScannerOverlay_line_color, ContextCompat.getColor(context, R.color.scanner_line));
+        lineWidth = a.getInteger(R.styleable.BarcodeScannerOverlay_line_width, getResources().getInteger(R.integer.line_width));
+        frames = a.getInteger(R.styleable.BarcodeScannerOverlay_line_speed, getResources().getInteger(R.integer.line_width));
     }
 
     @Override

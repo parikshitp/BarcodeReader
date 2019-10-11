@@ -1,9 +1,12 @@
 package com.fasiculus.barcodereader;
 
-import android.content.Intent;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +22,7 @@ public class ScanActivity extends AppCompatActivity implements BarcodeReader.Bar
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private BarcodeReader barcodeReader;
+    private boolean flashEnabled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,16 +38,46 @@ public class ScanActivity extends AppCompatActivity implements BarcodeReader.Bar
         // getting barcode instance
         barcodeReader = (BarcodeReader) getSupportFragmentManager().findFragmentById(R.id.barcode_fragment);
         Objects.requireNonNull(barcodeReader).setListener(this);
+
+        final ImageView img_flash = findViewById(R.id.img_flash);
+        img_flash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flashEnabled = !flashEnabled;
+                img_flash.setImageDrawable(flashEnabled ? getResources().getDrawable(R.drawable.flash_on) : getResources().getDrawable(R.drawable.flash_off));
+                barcodeReader.useFlash(flashEnabled);
+            }
+        });
     }
 
     @Override
     public void onScanned(final Barcode barcode) {
-        barcodeReader.playBeep();
+        //barcodeReader.playBeep();
 
-        Intent intent = new Intent(this, QrDetailsActivity.class);
+       /* Intent intent = new Intent(this, QrDetailsActivity.class);
         intent.putExtra("Data", barcode.displayValue);
         intent.putExtra("RawData", barcode.rawValue);
-        startActivity(intent);
+        startActivity(intent);*/
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                barcodeReader.stopPreview();
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(ScanActivity.this);
+                builder.setTitle("Result")
+                        .setMessage(barcode.rawValue);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        barcodeReader.startPreview();
+                    }
+                });
+
+                final AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     @Override

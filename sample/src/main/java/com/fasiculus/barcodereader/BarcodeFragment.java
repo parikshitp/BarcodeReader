@@ -1,14 +1,20 @@
 package com.fasiculus.barcodereader;
 
-import android.content.Intent;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.fasiculus.barcode.BarcodeReader;
@@ -21,6 +27,8 @@ public class BarcodeFragment extends Fragment implements BarcodeReader.BarcodeRe
     private static final String TAG = BarcodeFragment.class.getSimpleName();
 
     private BarcodeReader barcodeReader;
+    private boolean flashEnabled = false;
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     public BarcodeFragment() {
         // Required empty public constructor
@@ -34,18 +42,46 @@ public class BarcodeFragment extends Fragment implements BarcodeReader.BarcodeRe
 
         barcodeReader = (BarcodeReader) getChildFragmentManager().findFragmentById(R.id.barcode_fragment);
         Objects.requireNonNull(barcodeReader).setListener(this);
-
         return view;
     }
 
     @Override
-    public void onScanned(final Barcode barcode) {
-        barcodeReader.playBeep();
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        final ImageView img_flash = view.findViewById(R.id.img_flash);
+        img_flash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flashEnabled = !flashEnabled;
+                img_flash.setImageDrawable(flashEnabled ? getResources().getDrawable(R.drawable.flash_on) : getResources().getDrawable(R.drawable.flash_off));
+                barcodeReader.useFlash(flashEnabled);
+            }
+        });
+    }
 
-        Intent intent = new Intent(getContext(), QrDetailsActivity.class);
-        intent.putExtra("Data", barcode.displayValue);
-        intent.putExtra("RawData", barcode.rawValue);
-        startActivity(intent);
+    @Override
+    public void onScanned(final Barcode barcode) {
+        //barcodeReader.playBeep();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                barcodeReader.stopPreview();
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Result")
+                        .setMessage(barcode.rawValue);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        barcodeReader.startPreview();
+                    }
+                });
+
+                final AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     @Override

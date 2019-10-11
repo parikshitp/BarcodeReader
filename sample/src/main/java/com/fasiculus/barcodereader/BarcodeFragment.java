@@ -66,7 +66,7 @@ public class BarcodeFragment extends Fragment implements BarcodeReader.BarcodeRe
         handler.post(new Runnable() {
             @Override
             public void run() {
-                barcodeReader.stopPreview();
+                barcodeReader.pauseScanning();
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("Result")
@@ -74,7 +74,7 @@ public class BarcodeFragment extends Fragment implements BarcodeReader.BarcodeRe
 
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        barcodeReader.startPreview();
+                        barcodeReader.resumeScanning();
                     }
                 });
 
@@ -85,7 +85,7 @@ public class BarcodeFragment extends Fragment implements BarcodeReader.BarcodeRe
     }
 
     @Override
-    public void onScannedMultiple(List<Barcode> barcodes) {
+    public void onScannedMultiple(final List<Barcode> barcodes) {
         /*Log.e(TAG, "onScannedMultiple: " + barcodes.size());
 
         String codes = "";
@@ -100,6 +100,25 @@ public class BarcodeFragment extends Fragment implements BarcodeReader.BarcodeRe
                 Toast.makeText(getActivity(), "Barcodes: " + finalCodes, Toast.LENGTH_SHORT).show();
             }
         });*/
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                barcodeReader.pauseScanning();
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Result")
+                        .setMessage(barcodes.get(0).rawValue);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        barcodeReader.resumeScanning();
+                    }
+                });
+
+                final AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     @Override

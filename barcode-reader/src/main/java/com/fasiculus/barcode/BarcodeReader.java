@@ -15,10 +15,10 @@ import android.content.res.TypedArray;
 import android.hardware.Camera;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -43,6 +43,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public final class BarcodeReader extends Fragment implements View.OnTouchListener, BarcodeTrackerFactory.BarcodeReaderListener {
     private static final String TAG = BarcodeReader.class.getSimpleName();
@@ -235,16 +236,24 @@ public final class BarcodeReader extends Fragment implements View.OnTouchListene
         // Creates and starts the camera.  Note that this uses a higher resolution in comparison
         // to other detection examples to enable the barcode detector to detect small barcodes
         // at long distances.
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        Objects.requireNonNull(getActivity()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        if (displayMetrics.widthPixels == 0) {
+            displayMetrics.widthPixels = 1600;
+            displayMetrics.heightPixels = 1024;
+        }
+
         CameraSource.Builder builder = new CameraSource.Builder(getActivity(), barcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(1600, 1024)
-                .setRequestedFps(15.0f);
+                .setRequestedPreviewSize(displayMetrics.widthPixels, displayMetrics.heightPixels);
+
+        /*.setRequestedPreviewSize(1600, 1024)
+                .setRequestedFps(15.0f);*/
 
         // make sure that auto focus is an available option
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            builder = builder.setFocusMode(
-                    autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null);
-        }
+        builder = builder.setFocusMode(
+                autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null);
 
         mCameraSource = builder
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
@@ -372,13 +381,13 @@ public final class BarcodeReader extends Fragment implements View.OnTouchListene
     }
 
 
-    public void stopPreview() {
+    private void stopPreview() {
         if (mPreview != null) {
             mPreview.stop();
         }
     }
 
-    public void startPreview() {
+    private void startPreview() {
         startCameraSource();
     }
 
@@ -506,7 +515,7 @@ public final class BarcodeReader extends Fragment implements View.OnTouchListene
          */
         @Override
         public void onScaleEnd(ScaleGestureDetector detector) {
-            mCameraSource.doZoom(detector.getScaleFactor());
+            // mCameraSource.doZoom(detector.getScaleFactor());
         }
     }
 }

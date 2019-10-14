@@ -79,7 +79,6 @@ public final class BarcodeReader extends Fragment {
         return null;
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

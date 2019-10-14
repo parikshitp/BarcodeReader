@@ -14,9 +14,7 @@
             android:id="@+id/barcode_fragment"
             android:name="com.fasiculus.barcode.BarcodeReader"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:auto_focus="true"
-            app:use_flash="false" />
+            android:layout_height="match_parent" />
 
         <ImageView
             android:id="@+id/img_flash"

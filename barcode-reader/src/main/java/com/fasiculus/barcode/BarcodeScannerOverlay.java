@@ -90,7 +90,7 @@ public class BarcodeScannerOverlay extends ViewGroup {
         // draw horizontal line
         Paint line = new Paint();
         line.setColor(lineColor);
-        line.setStrokeWidth(Float.valueOf(lineWidth));
+        line.setStrokeWidth((float) lineWidth);
 
         // draw the line to product animation
         if (endY >= top + dpToPx(rectHeight) + frames) {

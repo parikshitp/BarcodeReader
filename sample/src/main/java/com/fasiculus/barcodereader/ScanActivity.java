@@ -1,12 +1,17 @@
 package com.fasiculus.barcodereader;
 
-import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,11 +20,9 @@ import androidx.appcompat.widget.Toolbar;
 import com.fasiculus.barcode.BarcodeReader;
 import com.google.android.gms.vision.barcode.Barcode;
 
-import java.util.List;
 import java.util.Objects;
 
 public class ScanActivity extends AppCompatActivity implements BarcodeReader.BarcodeReaderListener {
-    private static final String TAG = MainActivity.class.getSimpleName();
 
     private BarcodeReader barcodeReader;
     private boolean flashEnabled = false;
@@ -52,69 +55,8 @@ public class ScanActivity extends AppCompatActivity implements BarcodeReader.Bar
 
     @Override
     public void onScanned(final Barcode barcode) {
-        //barcodeReader.playBeep();
-
-       /* Intent intent = new Intent(this, QrDetailsActivity.class);
-        intent.putExtra("Data", barcode.displayValue);
-        intent.putExtra("RawData", barcode.rawValue);
-        startActivity(intent);*/
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                barcodeReader.pauseScanning();
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(ScanActivity.this);
-                builder.setTitle("Result")
-                        .setMessage(barcode.rawValue);
-
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        barcodeReader.resumeScanning();
-                    }
-                });
-
-                final AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
-    }
-
-    @Override
-    public void onScannedMultiple(final List<Barcode> barcodes) {
-        /*Log.e(TAG, "onScannedMultiple: " + barcodes.size());
-
-        StringBuilder codes = new StringBuilder();
-        for (Barcode barcode : barcodes) {
-            codes.append(barcode.displayValue).append(", ");
-        }
-
-        final String finalCodes = codes.toString();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), "Barcodes: " + finalCodes, Toast.LENGTH_SHORT).show();
-            }
-        });*/
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                barcodeReader.pauseScanning();
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(ScanActivity.this);
-                builder.setTitle("Result")
-                        .setMessage(barcodes.get(0).rawValue);
-
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        barcodeReader.resumeScanning();
-                    }
-                });
-
-                final AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
+        barcodeReader.pauseScanning();
+        setResultDialog(barcode.rawValue);
     }
 
     @Override
@@ -123,14 +65,58 @@ public class ScanActivity extends AppCompatActivity implements BarcodeReader.Bar
     }
 
     @Override
-    public void onScanError(String errorMessage) {
-
-    }
-
-    @Override
     public void onCameraPermissionDenied() {
         Toast.makeText(getApplicationContext(), "Camera permission denied!", Toast.LENGTH_LONG).show();
         finish();
+    }
+
+    private void playBeepSound() {
+        final MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.beep);
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        if (audioManager != null)
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+        mediaPlayer.start();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer1) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+            }
+        });
+    }
+
+    private void setResultDialog(String output) {
+        playBeepSound();
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.m_dialog);
+        dialog.setCancelable(true);
+        dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog1) {
+                barcodeReader.resumeScanning();
+            }
+        });
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog1) {
+                barcodeReader.resumeScanning();
+            }
+        });
+
+        TextView tv = dialog.findViewById(R.id.result_tv);
+        TextView tv_ok = dialog.findViewById(R.id.tv_ok);
+        tv.setText(output);
+        tv_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                barcodeReader.resumeScanning();
+            }
+        });
+        if (!isFinishing()) {
+            dialog.show();
+        }
     }
 
     /**

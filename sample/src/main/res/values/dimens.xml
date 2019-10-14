@@ -7,4 +7,8 @@
     <dimen name="lbl_movie_name">27dp</dimen>
     <dimen name="img_poster_height">220dp</dimen>
     <dimen name="dimen_40">40dp</dimen>
+
+    <dimen name="ten">10sp</dimen>
+    <dimen name="fifteen">15sp</dimen>
+    <dimen name="seventeen">17sp</dimen>
 </resources>

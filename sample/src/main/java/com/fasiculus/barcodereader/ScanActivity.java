@@ -40,6 +40,7 @@ public class ScanActivity extends AppCompatActivity implements BarcodeReader.Bar
 
         // getting barcode instance
         barcodeReader = (BarcodeReader) getSupportFragmentManager().findFragmentById(R.id.barcode_fragment);
+        Objects.requireNonNull(barcodeReader).setBarcodeFormats(Barcode.CODE_128 | Barcode.QR_CODE);
         Objects.requireNonNull(barcodeReader).setListener(this);
 
         final ImageView img_flash = findViewById(R.id.img_flash);

@@ -49,6 +49,7 @@ public final class BarcodeReader extends Fragment {
     private SurfaceView surfaceView;
     private CameraSource cameraSource;
     private Context context;
+    private int barcodeData = Barcode.ALL_FORMATS;
 
     public BarcodeReader() {
         // Required empty public constructor
@@ -193,8 +194,15 @@ public final class BarcodeReader extends Fragment {
         startScan();
     }
 
+    public void setBarcodeFormats(int barcode) {
+        barcodeData = barcode;
+        initializeCamera();
+    }
+
     private void initializeCamera() {
-        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context).build();
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context)
+                .setBarcodeFormats(barcodeData)
+                .build();
         cameraSource = new CameraSource.Builder(context, barcodeDetector)
                 .setAutoFocusEnabled(true)
                 .build();
